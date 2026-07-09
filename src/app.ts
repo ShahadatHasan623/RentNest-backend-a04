@@ -3,6 +3,7 @@ import cors from 'cors';
 import config from './config';
 import cookieParser from 'cookie-parser';
 import  HttpStatus  from 'http-status';
+import { userRoute } from './modules/user/user.route';
 const app=express();
 
 app.use(
@@ -23,5 +24,7 @@ app.get('/',(req:Request,res:Response)=>{
           message:"Rentnest Root layout"
      })
 })
+
+app.use('/api/auth',userRoute)
 
 export default app;
