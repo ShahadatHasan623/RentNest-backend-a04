@@ -4,6 +4,7 @@ model User {
   password  String
   name      String?  @db.VarChar(255)
   image     String?
+  activeStatus ActiveStatus   @default(ACTIVE)
   role      Role     @default(TENANT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

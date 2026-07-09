@@ -1,3 +1,9 @@
+enum ActiveStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
 enum Role {
   TENANT
   LANDLORD
