@@ -13,13 +13,19 @@ const registerUser = async (payload: User) => {
   if (isUsersExist) {
     throw new Error("User already exists with this email");
   }
-  const haspassword = bcrypt.hash(password, Number(config.bcrypt_round_salt));
+  const hashedPassword = await bcrypt.hash(password, Number(config.bcrypt_round_salt));
 
   const createUser = await prisma.user.create({
     data: {
       name,
       email,
-      password,
+      password: hashedPassword,
+      image,
+      profile:{
+        create:{
+          image
+        }
+      }
     },
   });
   const user =await prisma.user.findUnique({
@@ -28,11 +34,30 @@ const registerUser = async (payload: User) => {
     },
     omit:{
       password:true
+    },
+    include:{
+      profile:true
     }
   })
   return user;
 };
+const getMyProfile = async (userId: string) => {
+  const user =await prisma.user.findUniqueOrThrow({
+    where:{
+      id:userId
+    },
+    omit:{
+      password:true
+    },
+    include:{
+      profile:true
+    }
+  })
+  return user;
+
+}
 
 export const userService = {
   registerUser,
+  getMyProfile
 };
