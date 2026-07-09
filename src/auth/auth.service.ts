@@ -35,28 +35,33 @@ const loginUser = async (payload: ILoginUser) => {
     config.jwt_refresh_secret_token,
     config.jwt_refresh_expires_in as SignOptions
   );
+  console.log("Generated Access Token:", accessToken);
+  console.log("Access Secret:", config.jwt_secret_token);
   return {
     accessToken,
     refreshToken,
-    user
+    user,
   };
 };
-const refreshToken = async(refreshToken:string  )=>{
-   const verifiedRefreshToken =jwtUtils.verifyToken(refreshToken,config.jwt_refresh_secret_token)
-   if(verifiedRefreshToken.success){
-      throw new Error (verifiedRefreshToken.error)
-   }
-   const {id }=verifiedRefreshToken.data as JwtPayload
-   const user =await prisma.user.findUniqueOrThrow({
-      where:{
-         id
-      }
-   })
-   if(user.activeStatus === "BLOCKED"){
-      throw new Error("User is blocked");
-   }
+const refreshToken = async (refreshToken: string) => {
+  const verifiedRefreshToken = jwtUtils.verifyToken(
+    refreshToken,
+    config.jwt_refresh_secret_token
+  );
+  if (!verifiedRefreshToken.success) {
+    throw new Error(verifiedRefreshToken.error);
+  }
+  const { id } = verifiedRefreshToken.data as JwtPayload;
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+  if (user.activeStatus === "BLOCKED") {
+    throw new Error("User is blocked");
+  }
 
-   const jwtPayload = {
+  const jwtPayload = {
     id,
     name: user.name,
     email: user.email,
@@ -69,8 +74,8 @@ const refreshToken = async(refreshToken:string  )=>{
   );
 
   return { accessToken };
-}
-export const authService={
-   loginUser,
-   refreshToken
-}
+};
+export const authService = {
+  loginUser,
+  refreshToken,
+};
