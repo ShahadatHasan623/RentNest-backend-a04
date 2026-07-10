@@ -6,6 +6,7 @@ model User {
   image     String?
   activeStatus ActiveStatus   @default(ACTIVE)
   role      Role     @default(TENANT)
+  landlordProperties Properties[] @relation("LandlordProperties")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profile   Profile?
