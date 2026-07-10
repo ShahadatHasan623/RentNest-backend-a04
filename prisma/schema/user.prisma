@@ -7,7 +7,8 @@ model User {
   activeStatus ActiveStatus    @default(ACTIVE)
   role         Role            @default(TENANT)
   Properties   Properties[]    @relation("LandlordProperties")
-  rentals      RentalRequest[] @relation("TenantRentals")
+  tenant       RentalRequest[] @relation("TenantRentals")
+  landlord     RentalRequest[] @relation("LandlordRequests")
   review       Review[]
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
