@@ -22,3 +22,7 @@ enum PaymentStatus {
   COMPLETED
   FAILED
 }
+enum PaymentProvider {
+  STRIPE
+  SSLCOMMERZ
+}

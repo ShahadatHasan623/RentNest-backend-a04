@@ -4,6 +4,7 @@ model RentalRequest {
    tenant     User         @relation("TenantRentals", fields: [tenantId], references: [id])
    propertyId String
    property   Properties   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+   payment    Payment?
    moveInDate DateTime
    status     RentalStatus @default(PENDING)
    createdAt  DateTime     @default(now())
