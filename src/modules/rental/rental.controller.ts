@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { rentalService } from "./rentel.service";
 import { sendResponse } from "../../utils/SendResponse";
-import httpsStatus from "http-status"
+import httpStatus from "http-status"
 
 const createRentalRequest =catchAsync(async(req:Request,res:Response,next:NextFunction)=>{
    const id =req.user?.id;
@@ -12,12 +12,23 @@ const createRentalRequest =catchAsync(async(req:Request,res:Response,next:NextFu
 
    sendResponse(res,{
       success:true,
-      statusCode:httpsStatus.CREATED,
+      statusCode:httpStatus.CREATED,
       message:"Rental Created Successfully!",
       data:result
    })
 })
+const getMyRentals = catchAsync(async (req: Request, res: Response) => {
+  const result = await rentalService.getMyRentals(req.user!.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Rental list retrieved",
+    data: result,
+  });
+});
 
 export const rentalController={
-   createRentalRequest
+   createRentalRequest,
+   getMyRentals
 }
