@@ -28,7 +28,25 @@ const getAllCategories =async()=>{
    return getCategory
 }
 
+const updateCategories =async(payload:ICategory,id:string)=>{
+   const{name} =payload
+   await prisma.categories.findUniqueOrThrow({
+      where:{
+         id
+      }
+   })
+   const updateCategory =await prisma.categories.update({
+      where:{
+         id
+      },
+      data:{
+         name
+      }
+   })
+   return updateCategory
+}
 export const categoryService = {
   createCategory,
-  getAllCategories
+  getAllCategories,
+  updateCategories
 };
