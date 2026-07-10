@@ -12,4 +12,5 @@ export interface ICreateProperty {
   amenities: string[];
   images?: string[];
   categoryId: string;
+  available: boolean;
 }
