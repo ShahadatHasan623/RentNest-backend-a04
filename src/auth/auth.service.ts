@@ -35,8 +35,7 @@ const loginUser = async (payload: ILoginUser) => {
     config.jwt_refresh_secret_token,
     config.jwt_refresh_expires_in as SignOptions
   );
-  console.log("Generated Access Token:", accessToken);
-  console.log("Access Secret:", config.jwt_secret_token);
+  
   return {
     accessToken,
     refreshToken,
