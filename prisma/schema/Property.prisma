@@ -7,7 +7,9 @@ model Properties {
    rent        Float?
    bedrooms    Int?
    bathrooms   Int?
-   area        Float?
+   size        Float
+   amenities   String[]
+   images      String[]
    available   Boolean         @default(true)
    landlordId  String
    landlord    User            @relation("LandlordProperties", fields: [landlordId], references: [id], onDelete: Cascade)
