@@ -7,4 +7,5 @@ const router =Router()
 router.post('/',auth(Role.ADMIN),categoryController.createCategory)
 router.get("/",categoryController.getAllCategories)
 router.patch("/:id",auth(Role.ADMIN),categoryController.updateCategories)
+router.delete("/:id",auth(Role.ADMIN),categoryController.deleteCategories)
 export const categoryRoute =router

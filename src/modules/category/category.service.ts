@@ -45,8 +45,22 @@ const updateCategories =async(payload:ICategory,id:string)=>{
    })
    return updateCategory
 }
+const deleteCategories =async(id:string)=>{
+  await prisma.categories.findUniqueOrThrow({
+      where:{
+         id
+      }
+   })
+   const deleteCategory =await prisma.categories.delete({
+      where:{
+         id
+      }
+   })
+   return deleteCategory;
+}
 export const categoryService = {
   createCategory,
   getAllCategories,
-  updateCategories
+  updateCategories,
+  deleteCategories
 };
