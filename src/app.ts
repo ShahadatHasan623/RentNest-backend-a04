@@ -31,6 +31,7 @@ app.get('/',(req:Request,res:Response)=>{
 app.use('/api/auth',userRoute)
 app.use('/api/auth',authRoute)
 app.use("/api/categories", categoryRoute);
-app.use("/api/properties",propertiesRoute)
+app.use("/api/properties",propertiesRoute);
+app.use("/api/landlord/properties", propertiesRoute);
 
 export default app;
