@@ -64,10 +64,25 @@ const updateProperty = catchAsync(
     });
   }
 );
+const deleteProperty = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const userId = req.user?.id as string;
+
+    const result = await propertyService.deleteProperty(id as string, userId);
+    sendResponse(res,{
+      success:true,
+      statusCode:httpsStatus.OK,
+      message:"properties deleted successfully",
+      data:result
+    })
+  }
+);
 
 export const propertyController = {
   createProperty,
   getAllProperty,
   getSingleProperty,
-  updateProperty
+  updateProperty,
+  deleteProperty
 };
