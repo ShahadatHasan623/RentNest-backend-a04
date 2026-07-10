@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import  HttpStatus  from 'http-status';
 import { userRoute } from './modules/user/user.route';
 import { authRoute } from './auth/auth.route';
+import { categoryRoute } from './modules/category/category.route';
 const app=express();
 
 app.use(
@@ -28,5 +29,6 @@ app.get('/',(req:Request,res:Response)=>{
 
 app.use('/api/auth',userRoute)
 app.use('/api/auth',authRoute)
+app.use("/api/categories", categoryRoute);
 
 export default app;
