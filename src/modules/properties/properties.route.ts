@@ -8,5 +8,6 @@ const router =Router();
 
 router.post('/',auth(Role.LANDLORD),propertyController.createProperty)
 router.get('/',propertyController.getAllProperty)
+router.get('/:id',propertyController.getSingleProperty)
 
 export const propertiesRoute =router;

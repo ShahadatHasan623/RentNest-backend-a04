@@ -3,7 +3,6 @@ import { prisma } from "../../lib/prisma";
 import { ICreateProperty } from "./properties.interface";
 
 const createProperty = async (payload: ICreateProperty, landlordId: string) => {
-  const {} = payload;
   const category = await prisma.categories.findUnique({
     where: {
       id: payload.categoryId,
@@ -103,14 +102,39 @@ const getAllProperties = async (query: any) => {
     data: properties,
     meta: {
       total: totalProperties,
-      page:page,
-      limit:limit,
-      totalPage:Math.ceil(totalProperties / limit)
+      page: page,
+      limit: limit,
+      totalPage: Math.ceil(totalProperties / limit),
     },
   };
 };
 
+const getSingleProperty = async (id: string) => {
+  return await prisma.properties.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      category: true,
+      landlord: {
+        omit: {
+          password: true,
+        },
+      },
+      review: {
+        include: {
+          tenant: {
+            omit: {
+              password: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};
 export const propertyService = {
   createProperty,
   getAllProperties,
+  getSingleProperty
 };
