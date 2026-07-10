@@ -91,11 +91,40 @@ const getLandlordRequests = async (landlordId: string) => {
     },
   });
 };
+const updateRentalStatus = async (
+  rentalId: string,
+  landlordId: string,
+  status: RentalStatus
+) => {
+  const rental = await prisma.rentalRequest.findUnique({
+    where: {
+      id: rentalId,
+    },
+  });
+
+  if (!rental) {
+    throw new Error("Rental request not found");
+  }
+
+  if (rental.landlordId !== landlordId) {
+    throw new Error("Unauthorized");
+  }
+
+  return prisma.rentalRequest.update({
+    where: {
+      id: rentalId,
+    },
+
+    data: {
+      status,
+    },
+  });
+};
 
 export const rentalService = {
   createRentalRequest,
   getMyRentals,
   getSingleRental,
-  getLandlordRequests
-  
+  getLandlordRequests,
+  updateRentalStatus
 };

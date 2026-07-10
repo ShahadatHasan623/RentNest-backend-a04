@@ -50,9 +50,25 @@ const landlordRequests = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateStatus = catchAsync(async (req: Request, res: Response) => {
+  const result = await rentalService.updateRentalStatus(
+    req.params.id as string,
+    req.user!.id,
+    req.body.status
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Rental status updated",
+    data: result,
+  });
+});
+
 export const rentalController={
    createRentalRequest,
    getMyRentals,
    getSingleRental,
-   landlordRequests
+   landlordRequests,
+   updateStatus
 }
