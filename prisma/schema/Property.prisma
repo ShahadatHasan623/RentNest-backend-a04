@@ -1,0 +1,14 @@
+model Properties {
+   id          String  @id @default(uuid(7))
+   title       String
+   description String?
+   location    String?
+   address     String?
+   rent        Float?
+   bedrooms    Int?
+   bathrooms   Int?
+   area        Float?
+   available   Boolean @default(true)
+   categoryId  String 
+   category    Categories @relation(fields: [categoryId], references: [id],onDelete: Cascade)
+}
