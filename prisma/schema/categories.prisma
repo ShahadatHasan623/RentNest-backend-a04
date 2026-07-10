@@ -1,7 +1,8 @@
 model Categories {
-   id   String @id @default(uuid(7))
-   name String @db.VarChar(255)
+   id         String       @id @default(uuid())
+   name       String       @unique
    properties Properties[]
-   createdAt DateTime @default(now())
+   createdAt  DateTime     @default(now())
+
    @@map("categories")
 }
