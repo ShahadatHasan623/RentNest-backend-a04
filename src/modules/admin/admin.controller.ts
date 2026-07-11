@@ -28,7 +28,20 @@ const updateUserStatus =catchAsync(async(req:Request,res:Response,next:NextFunct
    })
 })
 
+const getAllProperties = catchAsync(async (req, res) => {
+  const result = await adminService.getAllProperties(req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Properties retrieved successfully",
+    data: result.data,
+    meta:result.meta
+  });
+});
+
 export const adminController ={
    getAllUser,
-   updateUserStatus
+   updateUserStatus,
+   getAllProperties
 }

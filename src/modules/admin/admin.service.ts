@@ -46,10 +46,7 @@ const getAllUser = async (query: any) => {
   };
 };
 
-const updateUserStatus = async (
-  id: string,
-  activeStatus: ActiveStatus
-) => {
+const updateUserStatus = async (id: string, activeStatus: ActiveStatus) => {
   await prisma.user.findUniqueOrThrow({
     where: {
       id,
@@ -65,8 +62,41 @@ const updateUserStatus = async (
     },
   });
 };
+const getAllProperties = async (query: any) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
 
+  const skip = (page - 1) * limit;
+
+  const properties = await prisma.properties.findMany({
+    skip,
+    take: limit,
+    include: {
+      landlord: {
+        omit: {
+          password: true,
+        },
+      },
+      category: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const total = await prisma.properties.count();
+
+  return {
+    data: properties,
+    meta: {
+      page,
+      limit,
+      total,
+    }
+  };
+};
 export const adminService = {
   getAllUser,
   updateUserStatus,
+  getAllProperties
 };
