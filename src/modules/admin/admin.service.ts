@@ -1,3 +1,4 @@
+import { ActiveStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
 const getAllUser = async (query: any) => {
@@ -45,7 +46,27 @@ const getAllUser = async (query: any) => {
   };
 };
 
+const updateUserStatus = async (
+  id: string,
+  activeStatus: ActiveStatus
+) => {
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  return await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      activeStatus,
+    },
+  });
+};
 
 export const adminService = {
   getAllUser,
+  updateUserStatus,
 };

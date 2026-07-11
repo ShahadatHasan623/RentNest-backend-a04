@@ -6,5 +6,6 @@ import { adminController } from "./admin.controller";
 
 const router =Router();
 router.get('/users',auth(Role.ADMIN),adminController.getAllUser)
+router.patch('/users/:id',auth(Role.ADMIN),adminController.updateUserStatus)
 
 export const adminRoute =router

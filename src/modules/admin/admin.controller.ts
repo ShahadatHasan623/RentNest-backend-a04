@@ -16,6 +16,19 @@ const getAllUser =catchAsync(async(req:Request,res:Response,next:NextFunction)=>
    })
 })
 
+const updateUserStatus =catchAsync(async(req:Request,res:Response,next:NextFunction)=>{
+   const id =req.params.id as string;
+   const status =req.body.activeStatus;
+   const result =await adminService.updateUserStatus(id,status);
+   sendResponse(res,{
+      success:true,
+      statusCode:httpStatus.OK,
+      message:"Updated retrived successfully",
+      data:result
+   })
+})
+
 export const adminController ={
-   getAllUser
+   getAllUser,
+   updateUserStatus
 }
