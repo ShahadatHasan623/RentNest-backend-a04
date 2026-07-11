@@ -158,8 +158,33 @@ const getMyPayments = async (userId: string) => {
   return payments;
 };
 
+const getPaymentById = async (paymentId: string, userId: string) => {
+  const payment = await prisma.payment.findFirst({
+    where: {
+      id: paymentId,
+      rentalRequest: {
+        tenantId: userId,
+      },
+    },
+    include: {
+      rentalRequest: {
+        include: {
+          property: true,
+        },
+      },
+    },
+  });
+
+  if (!payment) {
+    throw new Error("Payment not found");
+  }
+
+  return payment;
+};
+
 export const paymentService = {
   createPayment,
   stripeWebhook,
   getMyPayments,
+  getPaymentById,
 };

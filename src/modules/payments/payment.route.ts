@@ -7,5 +7,6 @@ const router = Router();
 router.post("/create", auth(Role.TENANT), paymentController.createPayment);
 router.post("/webhook", paymentController.stripeWebhook);
 router.get("/", auth(Role.TENANT), paymentController.getMyPayments);
+router.get("/:id", auth(Role.TENANT), paymentController.getSinglePayment);
 
 export const paymentsRoute = router;
