@@ -40,8 +40,20 @@ const getAllProperties = catchAsync(async (req, res) => {
   });
 });
 
+const getAllRentals = catchAsync(async (req, res) => {
+  const result = await adminService.getAllRental(req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Rentals retrieved successfully",
+    data: result,
+  });
+});
+
 export const adminController ={
    getAllUser,
    updateUserStatus,
-   getAllProperties
+   getAllProperties,
+   getAllRentals
 }

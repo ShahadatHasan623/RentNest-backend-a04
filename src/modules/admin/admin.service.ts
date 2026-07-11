@@ -92,11 +92,42 @@ const getAllProperties = async (query: any) => {
       page,
       limit,
       total,
-    }
+    },
+  };
+};
+const getAllRental = async (query: any) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = (page - 1) * limit;
+  const rentals = await prisma.rentalRequest.findMany({
+    skip,
+    take: limit,
+    include: {
+      tenant: {
+        omit: {
+          password: true,
+        },
+      },
+      property: true,
+      payment: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  const total = await prisma.rentalRequest.count();
+  return {
+    data: rentals,
+    meta: {
+      page,
+      limit,
+      total,
+    },
   };
 };
 export const adminService = {
   getAllUser,
   updateUserStatus,
-  getAllProperties
+  getAllProperties,
+  getAllRental
 };
