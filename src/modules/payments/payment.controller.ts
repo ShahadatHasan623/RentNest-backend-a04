@@ -1,0 +1,40 @@
+import { NextFunction, Request, Response } from "express";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/SendResponse";
+import httpStatus from "http-status";
+import { paymentService } from "./payment.service";
+
+const createPayment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+
+
+    const { rentalRequestId } = req.body;
+
+    const id = req.user?.id as string;
+    const result = await paymentService.createPayment(rentalRequestId, id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Checkout session created successfully",
+      data: result,
+    });
+  }
+);
+const stripeWebhook = catchAsync(async (req: Request, res: Response) => {
+  const signature = req.headers["stripe-signature"] as string;
+
+  await paymentService.stripeWebhook(req.body, signature);
+
+  sendResponse(res,{
+   success:true,
+   statusCode:httpStatus.OK,
+   message:"Stripe webhook retrived successfully",
+   data:null
+  })
+});
+
+export const paymentController = {
+  createPayment,
+  stripeWebhook
+};

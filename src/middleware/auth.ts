@@ -26,12 +26,16 @@ export const auth = (...requiredRoles: Role[]) => {
       : req.headers.authorization?.startsWith("Bearer")
       ? req.headers.authorization.split("")[1]
       : req.headers.authorization;
+      
     if (!token) {
       throw new Error(
         "You are not logged in.Please log in to access this resource."
       );
     }
-
+   console.log("Token:", token);
+   console.log("Required Roles:", requiredRoles);
+   console.log("JWT Secret:", config.jwt_secret_token);
+   console.log("Authorization Header:", req.headers.authorization);
     const verfiedUser = jwtUtils.verifyToken(token, config.jwt_secret_token);
 
     if (!verfiedUser.success) {
