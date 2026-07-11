@@ -41,16 +41,52 @@ const reviewCreate = async (tenantId: string, payload: IReview) => {
       comment,
     },
     include: {
-      tenant:{
-         omit:{
-            password:true
-         }
+      tenant: {
+        omit: {
+          password: true,
+        },
       },
-      property:true
+      property: true,
     },
   });
 };
 
+const getPropertyReviews = async (propertyId: string) => {
+  const reviews = await prisma.review.findMany({
+    where: {
+      propertyId,
+    },
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const average = await prisma.review.aggregate({
+    where: {
+      propertyId,
+    },
+    _avg: {
+      rating: true,
+    },
+  });
+
+  return {
+    averageRating: average._avg.rating || 0,
+    totalReviews: reviews.length,
+    reviews,
+  };
+};
+
 export const reviewService = {
   reviewCreate,
+  getPropertyReviews,
 };
