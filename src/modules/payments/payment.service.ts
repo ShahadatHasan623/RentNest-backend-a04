@@ -134,7 +134,32 @@ const stripeWebhook = async (payload: Buffer, signature: string) => {
   };
 };
 
+const getMyPayments = async (userId: string) => {
+  const payments = await prisma.payment.findMany({
+    where: {
+      rentalRequest: {
+        tenantId: userId,
+      },
+    },
+    include: {
+      rentalRequest: {
+        include: {
+          property: true,
+          tenant: true,
+          landlord: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return payments;
+};
+
 export const paymentService = {
   createPayment,
-  stripeWebhook
+  stripeWebhook,
+  getMyPayments,
 };

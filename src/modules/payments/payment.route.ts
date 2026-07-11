@@ -6,5 +6,6 @@ import { paymentController } from "./payment.controller";
 const router = Router();
 router.post("/create", auth(Role.TENANT), paymentController.createPayment);
 router.post("/webhook", paymentController.stripeWebhook);
+router.get("/", auth(Role.TENANT), paymentController.getMyPayments);
 
 export const paymentsRoute = router;
