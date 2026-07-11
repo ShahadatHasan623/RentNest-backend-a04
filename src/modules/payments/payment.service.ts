@@ -1,7 +1,6 @@
 import Stripe from "stripe";
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
-import httpStatus from "http-status";
 import { PaymentStatus, RentalStatus } from "../../../generated/prisma/enums";
 const stripe = new Stripe(config.stripe_secret_key as string);
 const createPayment = async (rentalRequestId: string, userId: string) => {
@@ -43,7 +42,7 @@ const createPayment = async (rentalRequestId: string, userId: string) => {
             name: rentalRequest.property.title,
             description: rentalRequest.property.location ?? "",
           },
-          unit_amount: Math.round(amount * 100),
+          unit_amount: Math.round(amount),
         },
         quantity: 1,
       },

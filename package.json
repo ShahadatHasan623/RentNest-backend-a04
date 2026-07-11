@@ -7,8 +7,10 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch ./src/server.ts",
+    "build": "tsup",
+    "postinstall": "prisma generate",
     "stripe:webhook": "stripe listen --forward-to localhost:5000/api/payments/confirm/webhook",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -35,6 +37,7 @@
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0",
-    "stripe": "^22.3.1"
+    "stripe": "^22.3.1",
+    "tsup": "^8.5.1"
   }
 }
