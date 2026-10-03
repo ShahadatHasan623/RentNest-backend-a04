@@ -28,7 +28,44 @@ const getMyProfile = catchAsync(
   }
 );
 
+const getAllUsers = catchAsync(
+  async (req: Request, res: Response) => {
+    const users = await userService.getAllUsers();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Users retrieved successfully",
+      data: users,
+    });
+  }
+);
+
+const updateUserStatus = catchAsync(
+  async (req: Request, res: Response) => {
+    const userId = req.params.id as string;
+    const { status } = req.body;
+
+    if (!status) {
+      throw new Error("Status is required");
+    }
+
+    const user = await userService.updateUserStatus(
+      userId,
+      status
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User status updated successfully",
+      data: user,
+    });
+  }
+);
 export const userController = {
   registerUser,
-  getMyProfile
+  getMyProfile,
+  getAllUsers,
+  updateUserStatus
 };

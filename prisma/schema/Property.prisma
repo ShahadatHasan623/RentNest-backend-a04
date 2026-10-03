@@ -5,6 +5,8 @@ model Properties {
    location    String?
    address     String?
    rent        Float?
+   city        String?
+   area        String?
    bedrooms    Int?
    bathrooms   Int?
    size        Float

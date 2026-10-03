@@ -2,21 +2,23 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { rentalService } from "./rentel.service";
 import { sendResponse } from "../../utils/SendResponse";
-import httpStatus from "http-status"
+import httpStatus from "http-status";
 
-const createRentalRequest =catchAsync(async(req:Request,res:Response,next:NextFunction)=>{
-   const id =req.user?.id;
-   const payload =req.body;
-   
-   const result =await rentalService.createRentalRequest(id as string ,payload)
+const createRentalRequest = catchAsync(async (req: Request, res: Response) => {
+  const tenantId = req.user?.id as string;
 
-   sendResponse(res,{
-      success:true,
-      statusCode:httpStatus.CREATED,
-      message:"Rental Created Successfully!",
-      data:result
-   })
-})
+  const payload = req.body;
+
+
+  const result = await rentalService.createRentalRequest(payload, tenantId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Rental request created successfully",
+    data: result,
+  });
+});
 const getMyRentals = catchAsync(async (req: Request, res: Response) => {
   const result = await rentalService.getMyRentals(req.user!.id);
 
@@ -65,10 +67,10 @@ const updateStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const rentalController={
-   createRentalRequest,
-   getMyRentals,
-   getSingleRental,
-   landlordRequests,
-   updateStatus
-}
+export const rentalController = {
+  createRentalRequest,
+  getMyRentals,
+  getSingleRental,
+  landlordRequests,
+  updateStatus,
+};

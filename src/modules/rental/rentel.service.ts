@@ -3,52 +3,66 @@ import { prisma } from "../../lib/prisma";
 import { IRentalRequest } from "./rental.interface";
 
 const createRentalRequest = async (
-  tenantId: string,
-  payload: IRentalRequest
+  payload: {
+    propertyId: string;
+    moveInDate: string;
+    duration: number;
+  },
+  tenantId: string
 ) => {
-  const property = await prisma.properties.findUnique({
+
+
+  if (!payload.propertyId) {
+    throw new Error("Property ID is required");
+  }
+
+  if (!payload.moveInDate) {
+    throw new Error("Move-in date is required");
+  }
+
+  if (!payload.duration) {
+    throw new Error("Duration is required");
+  }
+
+  const property = await prisma.properties.findUniqueOrThrow({
     where: {
       id: payload.propertyId,
     },
   });
-  if (!property) {
-    throw new Error("Property Not found");
-  }
+
   if (!property.available) {
-    throw new Error("Property is not available");
+    throw new Error("This property is not available");
   }
-  const alreadyRequested = await prisma.rentalRequest.findFirst({
-    where: {
-      propertyId: payload.propertyId,
-      tenantId,
-      status: RentalStatus.PENDING,
-    },
-  });
-  if (alreadyRequested) {
-    throw new Error("You already requested this property");
+
+  const moveInDate = new Date(payload.moveInDate);
+
+  if (Number.isNaN(moveInDate.getTime())) {
+    throw new Error("Invalid move-in date");
   }
+
   const rental = await prisma.rentalRequest.create({
     data: {
       tenantId,
       landlordId: property.landlordId,
-      propertyId: payload.propertyId,
-      moveInDate: new Date(payload.moveInDate),
-      duration: payload.duration,
+      propertyId: property.id,
+      moveInDate,
+      duration: Number(payload.duration),
     },
-    include:{
-      property:true,
-      tenant:{
-         omit:{
-            password:true
-         }
+    include: {
+      property: true,
+      tenant: {
+        omit: {
+          password: true,
+        },
       },
-      landlord:{
-         omit:{
-            password:true
-         }
-      }
-    }
+      landlord: {
+        omit: {
+          password: true,
+        },
+      },
+    },
   });
+
   return rental;
 };
 const getMyRentals = async (tenantId: string) => {
@@ -58,13 +72,13 @@ const getMyRentals = async (tenantId: string) => {
     },
 
     include: {
-      property:true,
+      property: true,
       payment: true,
     },
   });
 };
 const getSingleRental = async (id: string) => {
-  const singleRental= prisma.rentalRequest.findUniqueOrThrow({
+  const singleRental = prisma.rentalRequest.findUniqueOrThrow({
     where: {
       id,
     },
@@ -126,5 +140,5 @@ export const rentalService = {
   getMyRentals,
   getSingleRental,
   getLandlordRequests,
-  updateRentalStatus
+  updateRentalStatus,
 };

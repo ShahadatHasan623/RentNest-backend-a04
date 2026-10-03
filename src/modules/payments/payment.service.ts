@@ -3,6 +3,7 @@ import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import { PaymentStatus, RentalStatus } from "../../../generated/prisma/enums";
 const stripe = new Stripe(config.stripe_secret_key as string);
+
 const createPayment = async (rentalRequestId: string, userId: string) => {
   const rentalRequest = await prisma.rentalRequest.findUnique({
     where: {
@@ -13,27 +14,49 @@ const createPayment = async (rentalRequestId: string, userId: string) => {
       tenant: true,
     },
   });
+
   if (!rentalRequest) {
     throw new Error("Rental request not found");
   }
+
   if (rentalRequest.tenantId !== userId) {
     throw new Error("Unauthorized");
   }
+
   if (rentalRequest.status !== "APPROVED") {
     throw new Error("Rental request is not approved");
   }
+
   const paymentExist = await prisma.payment.findUnique({
     where: {
       rentalRequestId,
     },
   });
+
   if (paymentExist && paymentExist.status === "COMPLETED") {
     throw new Error("Payment already completed");
   }
+
   const amount = rentalRequest.property.rent ?? 0;
+
+  // Create payment first
+  const payment =
+    paymentExist ??
+    (await prisma.payment.create({
+      data: {
+        rentalRequestId,
+        transactionId: "",
+        amount,
+        method: "CARD",
+        provider: "STRIPE",
+        status: "PENDING",
+      },
+    }));
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     mode: "payment",
+
     line_items: [
       {
         price_data: {
@@ -47,31 +70,36 @@ const createPayment = async (rentalRequestId: string, userId: string) => {
         quantity: 1,
       },
     ],
+
     customer_email: rentalRequest.tenant.email,
+
     metadata: {
+      paymentId: payment.id,
       rentalRequestId,
       tenantId: userId,
     },
-    success_url: `${config.app_url}/payment/success`,
+
+    success_url: `${config.app_url}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+
     cancel_url: `${config.app_url}/payment/cancel`,
   });
-  if (!paymentExist) {
-    await prisma.payment.create({
-      data: {
-        rentalRequestId,
-        transactionId: session.id,
-        amount,
-        method: "CARD",
-        provider: "STRIPE",
-        status: "PENDING",
-      },
-    });
-  }
+
+  // Save Stripe session ID
+  await prisma.payment.update({
+    where: {
+      id: payment.id,
+    },
+    data: {
+      transactionId: session.id,
+    },
+  });
+
   return {
     checkoutUrl: session.url,
     sessionId: session.id,
   };
 };
+
 const stripeWebhook = async (payload: Buffer, signature: string) => {
   if (!signature) {
     throw new Error("Stripe signature missing");
