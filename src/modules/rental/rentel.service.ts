@@ -1,6 +1,6 @@
 import { RentalStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
-import { IRentalRequest } from "./rental.interface";
+
 
 const createRentalRequest = async (
   payload: {
@@ -10,8 +10,6 @@ const createRentalRequest = async (
   },
   tenantId: string
 ) => {
-
-
   if (!payload.propertyId) {
     throw new Error("Property ID is required");
   }
@@ -29,7 +27,6 @@ const createRentalRequest = async (
       id: payload.propertyId,
     },
   });
-
   if (!property.available) {
     throw new Error("This property is not available");
   }
@@ -62,7 +59,6 @@ const createRentalRequest = async (
       },
     },
   });
-
   return rental;
 };
 const getMyRentals = async (tenantId: string) => {
@@ -94,17 +90,18 @@ const getSingleRental = async (id: string) => {
 };
 
 const getLandlordRequests = async (landlordId: string) => {
-  return prisma.rentalRequest.findMany({
+  const rentals = await prisma.rentalRequest.findMany({
     where: {
       landlordId,
     },
-
     include: {
       property: true,
       tenant: true,
     },
   });
+  return rentals;
 };
+
 const updateRentalStatus = async (
   rentalId: string,
   landlordId: string,
@@ -124,16 +121,30 @@ const updateRentalStatus = async (
     throw new Error("Unauthorized");
   }
 
-  return prisma.rentalRequest.update({
-    where: {
-      id: rentalId,
-    },
+  // Only ACTIVE rental can be completed
+  if (
+    status === RentalStatus.COMPLETED &&
+    rental.status !== RentalStatus.ACTIVE
+  ) {
+    throw new Error(
+      "Only active rentals can be completed"
+    );
+  }
 
-    data: {
-      status,
-    },
-  });
+  const updatedRental =
+    await prisma.rentalRequest.update({
+      where: {
+        id: rentalId,
+      },
+      data: {
+        status,
+      },
+    });
+
+  return updatedRental;
 };
+
+
 
 export const rentalService = {
   createRentalRequest,

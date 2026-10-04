@@ -26,3 +26,8 @@ enum PaymentProvider {
   STRIPE
   SSLCOMMERZ
 }
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

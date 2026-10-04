@@ -3,13 +3,33 @@ import { auth } from "../../middleware/auth";
 import { Role } from "../../../generated/prisma/enums";
 import { propertyController } from "./properties.controller";
 
+const router = Router();
 
-const router =Router();
+router.post("/", auth(Role.LANDLORD), propertyController.createProperty);
 
-router.post('/',auth(Role.LANDLORD),propertyController.createProperty)
-router.get('/',propertyController.getAllProperty)
-router.get('/:id',propertyController.getSingleProperty)
-router.put('/:id',auth(Role.LANDLORD),propertyController.updateProperty)
-router.delete('/:id',auth(Role.LANDLORD),propertyController.deleteProperty)
+router.get(
+  "/admin/pending",
+  auth(Role.ADMIN),
+  propertyController.getPendingProperties
+);
 
-export const propertiesRoute =router;
+router.patch(
+  "/:id/moderation",
+  auth(Role.ADMIN),
+  propertyController.updatePropertyModeration
+);
+
+router.get("/", propertyController.getAllProperty);
+
+router.get("/:id", propertyController.getSingleProperty);
+
+router.put("/:id", auth(Role.LANDLORD), propertyController.updateProperty);
+
+router.delete("/:id", auth(Role.LANDLORD), propertyController.deleteProperty);
+router.get(
+  "/admin/all",
+  auth(Role.ADMIN),
+  propertyController.getAllPropertiesForAdmin
+);
+
+export const propertiesRoute = router;

@@ -19,53 +19,51 @@ const registerUser = catchAsync(
 const getMyProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const profile = await userService.getMyProfile(req.user?.id as string);
-    sendResponse(res,{
-      success:true,
-      statusCode:httpStatus.OK,
-      message:"my profile retrived successfully",
-      data:profile
-    })
-  }
-);
-
-const getAllUsers = catchAsync(
-  async (req: Request, res: Response) => {
-    const users = await userService.getAllUsers();
-
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
-      message: "Users retrieved successfully",
-      data: users,
+      message: "my profile retrived successfully",
+      data: profile,
     });
   }
 );
 
-const updateUserStatus = catchAsync(
-  async (req: Request, res: Response) => {
-    const userId = req.params.id as string;
-    const { status } = req.body;
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const search = req.query.search as string | undefined;
 
-    if (!status) {
-      throw new Error("Status is required");
-    }
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
 
-    const user = await userService.updateUserStatus(
-      userId,
-      status
-    );
+  const result = await userService.getAllUsers(search, page, limit);
 
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "User status updated successfully",
-      data: user,
-    });
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Users retrieved successfully",
+    data: result,
+  });
+});
+
+const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+  const { status } = req.body;
+
+  if (!status) {
+    throw new Error("Status is required");
   }
-);
+
+  const user = await userService.updateUserStatus(userId, status);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User status updated successfully",
+    data: user,
+  });
+});
 export const userController = {
   registerUser,
   getMyProfile,
   getAllUsers,
-  updateUserStatus
+  updateUserStatus,
 };

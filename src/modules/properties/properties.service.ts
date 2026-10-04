@@ -1,3 +1,4 @@
+import { ModerationStatus } from "../../../generated/prisma/enums";
 import { PropertiesWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 import { ICreateProperty } from "./properties.interface";
@@ -160,27 +161,15 @@ const updateProperty = async (
 
   return result;
 };
-const deleteProperty = async (
-  id: string,
-  userId: string
-) => {
-  const property =
-    await prisma.properties.findUniqueOrThrow({
-      where: {
-        id,
-      },
-    });
-
-  console.log("DELETE PROPERTY DEBUG:", {
-    propertyId: property.id,
-    propertyLandlordId: property.landlordId,
-    loggedInUserId: userId,
+const deleteProperty = async (id: string, userId: string) => {
+  const property = await prisma.properties.findUniqueOrThrow({
+    where: {
+      id,
+    },
   });
 
   if (property.landlordId !== userId) {
-    throw new Error(
-      "You are not authorized to delete this property"
-    );
+    throw new Error("You are not authorized to delete this property");
   }
 
   await prisma.properties.delete({
@@ -191,10 +180,69 @@ const deleteProperty = async (
 
   return null;
 };
+
+const getPendingProperties = async () => {
+  const properties = await prisma.properties.findMany({
+    where: {
+      moderationStatus: "PENDING",
+    },
+    include: {
+      landlord: true,
+      category: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return properties;
+};
+
+const updatePropertyModeration = async (
+  propertyId: string,
+  status: "APPROVED" | "REJECTED"
+) => {
+  const property = await prisma.properties.findUnique({
+    where: {
+      id: propertyId,
+    },
+  });
+
+  if (!property) {
+    throw new Error("Property not found");
+  }
+
+  const result = await prisma.properties.update({
+    where: {
+      id: propertyId,
+    },
+    data: {
+      moderationStatus: status,
+    },
+  });
+
+  return result;
+};
+const getAllPropertiesForAdmin = async () => {
+  const properties = await prisma.properties.findMany({
+    include: {
+      landlord: true,
+      category: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return properties;
+};
 export const propertyService = {
   createProperty,
   getAllProperties,
   getSingleProperty,
   updateProperty,
-  deleteProperty
+  deleteProperty,
+  getPendingProperties,
+  updatePropertyModeration,
+  getAllPropertiesForAdmin,
 };

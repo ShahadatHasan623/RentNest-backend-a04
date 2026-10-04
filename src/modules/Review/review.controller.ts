@@ -28,9 +28,24 @@ const getPropertyReviews = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getMyReviews = catchAsync(
+  async (req: Request, res: Response) => {
+    const tenantId = req.user?.id as string;
 
+    const result =
+      await reviewService.getMyReviews(tenantId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "My reviews retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 export const reviewController ={
    reviewCreate,
-   getPropertyReviews
+   getPropertyReviews,
+   getMyReviews
 }

@@ -1,24 +1,25 @@
 model Properties {
-   id          String          @id @default(uuid(7))
-   title       String
-   description String?
-   location    String?
-   address     String?
-   rent        Float?
-   city        String?
-   area        String?
-   bedrooms    Int?
-   bathrooms   Int?
-   size        Float
-   amenities   String[]
-   images      String[]
-   available   Boolean         @default(true)
-   landlordId  String
-   landlord    User            @relation("LandlordProperties", fields: [landlordId], references: [id], onDelete: Cascade)
-   categoryId  String
-   category    Categories      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-   rental      RentalRequest[]
-   review      Review[]
-   createdAt   DateTime        @default(now())
-   updatedAt   DateTime        @updatedAt
+   id               String           @id @default(uuid(7))
+   title            String
+   description      String?
+   location         String?
+   address          String?
+   rent             Float?
+   city             String?
+   area             String?
+   bedrooms         Int?
+   bathrooms        Int?
+   size             Float
+   amenities        String[]
+   images           String[]
+   available        Boolean          @default(true)
+   moderationStatus ModerationStatus @default(PENDING)
+   landlordId       String
+   landlord         User             @relation("LandlordProperties", fields: [landlordId], references: [id], onDelete: Cascade)
+   categoryId       String
+   category         Categories       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+   rental           RentalRequest[]
+   review           Review[]
+   createdAt        DateTime         @default(now())
+   updatedAt        DateTime         @updatedAt
 }

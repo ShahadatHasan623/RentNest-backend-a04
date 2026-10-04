@@ -70,20 +70,56 @@ const getMyProfile = async (userId: string) => {
 };
 
 // Admin: Get all users
-const getAllUsers = async () => {
-  return prisma.user.findMany({
-    omit: {
-      password: true,
-    },
-    include: {
-      profile: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-};
+const getAllUsers = async (search?: string, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
 
+  const where = search?.trim()
+    ? {
+        OR: [
+          {
+            name: {
+              contains: search.trim(),
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            email: {
+              contains: search.trim(),
+              mode: "insensitive" as const,
+            },
+          },
+        ],
+      }
+    : {};
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take: limit,
+      omit: {
+        password: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+
+    prisma.user.count({
+      where,
+    }),
+  ]);
+
+  return {
+    users,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
 const updateUserStatus = async (userId: string, status: ActiveStatus) => {
   const user = await prisma.user.findUnique({
     where: {
