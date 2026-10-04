@@ -6,8 +6,6 @@ import { paymentService } from "./payment.service";
 
 const createPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-
-
     const { rentalRequestId } = req.body;
 
     const id = req.user?.id as string;
@@ -23,15 +21,18 @@ const createPayment = catchAsync(
 );
 const stripeWebhook = catchAsync(async (req: Request, res: Response) => {
   const signature = req.headers["stripe-signature"] as string;
-
+  console.log("========== STRIPE WEBHOOK ==========");
+  console.log("Signature exists:", !!signature);
+  console.log("Body is Buffer:", Buffer.isBuffer(req.body));
+  console.log("Body length:", req.body?.length);
   await paymentService.stripeWebhook(req.body, signature);
 
-  sendResponse(res,{
-   success:true,
-   statusCode:httpStatus.OK,
-   message:"Stripe webhook retrived successfully",
-   data:null
-  })
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Stripe webhook retrived successfully",
+    data: null,
+  });
 });
 const getMyPayments = catchAsync(async (req: Request, res: Response) => {
   const result = await paymentService.getMyPayments(req.user!.id);

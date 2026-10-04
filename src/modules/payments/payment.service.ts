@@ -114,10 +114,12 @@ const stripeWebhook = async (payload: Buffer, signature: string) => {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-
       const paymentId = session.metadata?.paymentId;
 
-      if (!paymentId) break;
+      if (!paymentId) {
+        console.log("Payment ID missing from metadata");
+        break;
+      }
 
       const payment = await prisma.payment.findUnique({
         where: {
@@ -125,7 +127,10 @@ const stripeWebhook = async (payload: Buffer, signature: string) => {
         },
       });
 
-      if (!payment) break;
+      if (!payment) {
+        console.log("Payment not found:", paymentId);
+        break;
+      }
 
       await prisma.$transaction(async (tx) => {
         await tx.payment.update({
@@ -134,7 +139,10 @@ const stripeWebhook = async (payload: Buffer, signature: string) => {
           },
           data: {
             status: PaymentStatus.COMPLETED,
-            transactionId: session.payment_intent as string,
+            transactionId:
+              typeof session.payment_intent === "string"
+                ? session.payment_intent
+                : "",
             paidAt: new Date(),
           },
         });
@@ -149,9 +157,10 @@ const stripeWebhook = async (payload: Buffer, signature: string) => {
         });
       });
 
+      console.log("Payment completed:", payment.id);
+
       break;
     }
-
     default:
       console.log(`Unhandled Event: ${event.type}`);
   }

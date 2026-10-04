@@ -21,11 +21,20 @@ app.use(
   })
 );
 
-app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
+app.use(
+  "/api/payments/confirm/webhook",
+  express.raw({ type: "application/json" })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.get("/", (req: Request, res: Response) => {
+  res.status(HttpStatus.OK).json({
+    success: true,
+    message: "Welcome to RentNest API",
+  });
+});
 
 app.use("/api/payments", paymentsRoute);
 app.use("/api/auth", userRoute);
